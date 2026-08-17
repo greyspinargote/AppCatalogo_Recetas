@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
 }
 
 android {
@@ -55,4 +56,24 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+
+// ViewModel + StateFlow en Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+
+// Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+
+// Coil (imágenes desde internet)
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+// Retrofit + Gson (consumo de la API TheMealDB)
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+// Iconos extendidos (Favorite, ArrowBack, etc.)
+    implementation("androidx.compose.material:material-icons-extended")
 }
