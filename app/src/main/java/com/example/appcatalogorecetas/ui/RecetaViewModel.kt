@@ -27,14 +27,14 @@ class RecetaViewModel(application: Application) : AndroidViewModel(application) 
     private val _cargando = MutableStateFlow(false)
     val cargando: StateFlow<Boolean> = _cargando.asStateFlow()
 
-    // NUEVO: estado de error, para cumplir con el requisito de mostrar
+    // Estado de error, para cumplir con el requisito de mostrar
     // "cargando / éxito / error" del profe
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
     init {
         val dao = RecetaDatabase.getDatabase(application).recetaDao()
-        repository = RecetaRepository(RetrofitClient.apiService, dao)
+        repository = RecetaRepository(RetrofitClient.apiService, RetrofitClient.translateApiService, dao)
 
         viewModelScope.launch {
             repository.recetasFavoritas.collect { lista ->

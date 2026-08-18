@@ -76,4 +76,5 @@ dependencies {
 
 // Iconos extendidos (Favorite, ArrowBack, etc.)
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 }

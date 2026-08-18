@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,6 +48,9 @@ fun PantallaCatalogo(navController: NavController, viewModel: RecetaViewModel) {
                     IconButton(onClick = { navController.navigate("favoritos") }) {
                         Icon(Icons.Default.Favorite, contentDescription = "Mis favoritas")
                     }
+                    IconButton(onClick = { navController.navigate("ajustes") }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Configuración")
+                    }
                 }
             )
         }
@@ -70,14 +74,11 @@ fun PantallaCatalogo(navController: NavController, viewModel: RecetaViewModel) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ESTADO: CARGANDO
             if (cargando) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
-            }
-            // ESTADO: ERROR
-            else if (error != null) {
+            } else if (error != null) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = error ?: "Ocurrió un error",
@@ -85,9 +86,7 @@ fun PantallaCatalogo(navController: NavController, viewModel: RecetaViewModel) {
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-            }
-            // ESTADO: ÉXITO
-            else {
+            } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(recetas) { receta ->
                         ItemReceta(
