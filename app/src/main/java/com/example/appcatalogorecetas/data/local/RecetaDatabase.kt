@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Receta::class], version = 1, exportSchema = false)
+@Database(entities = [Receta::class], version = 2, exportSchema = false)
 abstract class RecetaDatabase : RoomDatabase() {
 
     abstract fun recetaDao(): RecetaDao
@@ -20,7 +20,9 @@ abstract class RecetaDatabase : RoomDatabase() {
                     context.applicationContext,
                     RecetaDatabase::class.java,
                     "receta_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration(dropAllTables = true) // si cambia la tabla, la recrea
+                    .build()
                 INSTANCE = instance
                 instance
             }

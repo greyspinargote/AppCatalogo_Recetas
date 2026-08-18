@@ -1,7 +1,13 @@
 package com.example.appcatalogorecetas.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,21 +18,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.appcatalogorecetas.data.local.Receta
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, recetaId: String) {
 
+    val context = LocalContext.current
+
     var recetaState by remember { mutableStateOf<Receta?>(null) }
     var cargando by remember { mutableStateOf(true) }
+    var uriTemporal by remember { mutableStateOf<Uri?>(null) }
+    var permisoDenegado by remember { mutableStateOf(false) }
 
     val favoritas by viewModel.recetasFavoritas.collectAsState()
     val esFavorito = favoritas.any { it.id == recetaId }
@@ -35,6 +53,43 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
         cargando = true
         recetaState = viewModel.obtenerDetalle(recetaId)
         cargando = false
+    }
+
+    // Lanza la cámara. Si sale bien, guarda la foto junto a la receta como favorita.
+    val lanzadorCamara = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { exito ->
+        if (exito && uriTemporal != null) {
+            recetaState?.let { receta ->
+                val recetaConFoto = receta.copy(fotoUri = uriTemporal.toString())
+                recetaState = recetaConFoto
+                viewModel.guardarFavorito(recetaConFoto)
+            }
+        }
+    }
+
+    // Pide el permiso de cámara en tiempo de ejecución
+    val lanzadorPermiso = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { concedido ->
+        if (concedido) {
+            val nuevaUri = crearUriParaFoto(context)
+            uriTemporal = nuevaUri
+            lanzadorCamara.launch(nuevaUri)
+        } else {
+            permisoDenegado = true
+        }
+    }
+
+    fun abrirCamara() {
+        val permisoActual = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+        if (permisoActual == PackageManager.PERMISSION_GRANTED) {
+            val nuevaUri = crearUriParaFoto(context)
+            uriTemporal = nuevaUri
+            lanzadorCamara.launch(nuevaUri)
+        } else {
+            lanzadorPermiso.launch(Manifest.permission.CAMERA)
+        }
     }
 
     val receta = recetaState
@@ -120,6 +175,41 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // SECCIÓN: MI VERSIÓN (CÁMARA)
+                Text(text = "Mi versión", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (receta.fotoUri != null) {
+                    AsyncImage(
+                        model = Uri.parse(receta.fotoUri),
+                        contentDescription = "Mi versión de la receta",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                OutlinedButton(
+                    onClick = { abrirCamara() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (receta.fotoUri == null) "📷 Tomar foto de mi versión" else "📷 Tomar otra foto")
+                }
+
+                if (permisoDenegado) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Necesitas dar permiso de cámara para usar esta función. Puedes activarlo en Ajustes del sistema > Apps > AppCatalogoRecetas > Permisos.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
                 Button(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier.fillMaxWidth().height(50.dp)
@@ -130,4 +220,15 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
             }
         }
     }
+}
+
+// Crea un archivo vacío en el almacenamiento de la app y devuelve una Uri segura
+// (a través de FileProvider) para que la cámara pueda guardar la foto ahí.
+private fun crearUriParaFoto(context: android.content.Context): Uri {
+    val carpeta = context.getExternalFilesDir("Pictures")
+    if (carpeta != null && !carpeta.exists()) carpeta.mkdirs()
+    val nombreArchivo = "receta_" +
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date()) + ".jpg"
+    val archivo = File(carpeta, nombreArchivo)
+    return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", archivo)
 }

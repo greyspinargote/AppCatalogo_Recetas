@@ -10,5 +10,6 @@ data class Receta(
     val nombre: String,
     val categoria: String?,
     val instrucciones: String?,
-    val imagenUrl: String?
+    val imagenUrl: String?,
+    val fotoUri: String? = null // NUEVO: foto de la versión de la receta
 )
