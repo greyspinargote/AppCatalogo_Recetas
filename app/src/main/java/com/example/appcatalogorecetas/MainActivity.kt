@@ -33,6 +33,8 @@ import com.example.appcatalogorecetas.ui.PantallaFavoritos
 import com.example.appcatalogorecetas.ui.PantallaInicio
 import com.example.appcatalogorecetas.ui.RecetaViewModel
 import com.example.appcatalogorecetas.ui.theme.AppCatalogoRecetasTheme
+import com.example.appcatalogorecetas.ui.PantallaBusqueda
+import com.example.appcatalogorecetas.ui.PantallaCategorias
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,11 +71,14 @@ fun RecetarioApp() {
                 }
 
                 composable("buscar") {
-                    PantallaCatalogo(navController = navController, viewModel = recetaViewModel)
+                    PantallaBusqueda(navController = navController, viewModel = recetaViewModel)
                 }
 
                 composable("favoritos") {
                     PantallaFavoritos(navController = navController, viewModel = recetaViewModel)
+                }
+                composable("categorias") {
+                    PantallaCategorias(navController = navController, viewModel = recetaViewModel)
                 }
 
                 composable("detalles/{id}") { backStackEntry ->

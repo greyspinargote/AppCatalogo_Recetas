@@ -27,16 +27,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-private data class CategoriaInicio(val emoji: String, val nombreEspanol: String, val nombreIngles: String)
-
-private val categoriasInicio = listOf(
-    CategoriaInicio("🍝", "Pastas", "Pasta"),
-    CategoriaInicio("🍗", "Pollo", "Chicken"),
-    CategoriaInicio("🥩", "Res", "Beef"),
-    CategoriaInicio("🍰", "Postres", "Dessert"),
-    CategoriaInicio("🍤", "Mariscos", "Seafood"),
-    CategoriaInicio("🥗", "Vegetariano", "Vegetarian")
-)
+// La lista de categorías (categoriasInicio) vive en CategoriasData.kt
 
 @Composable
 fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
@@ -47,6 +38,7 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
     val recetasApi by viewModel.recetasApi.collectAsState()
     val novedad = recetasApi.firstOrNull()
 
+    // Estado de la ubicación: null = todavía no se activó
     var textoUbicacion by remember { mutableStateOf<String?>(null) }
     var ubicacionNoDisponible by remember { mutableStateOf(false) }
     var cargandoUbicacion by remember { mutableStateOf(false) }
@@ -80,6 +72,7 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
         }
     }
 
+    // Pide el permiso de ubicación en tiempo de ejecución (mismo patrón que la cámara en Detalles)
     val lanzadorPermisoUbicacion = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -112,6 +105,7 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
         ) {
             Spacer(Modifier.height(16.dp))
 
+            // 👋 Saludo
             Text(
                 text = "¡Hola! 👋",
                 style = MaterialTheme.typography.headlineSmall,
@@ -120,6 +114,7 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
 
             Spacer(Modifier.height(16.dp))
 
+            // 📍 Ubicación / GPS
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp)
@@ -153,6 +148,7 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
 
             Spacer(Modifier.height(24.dp))
 
+            // 🍝 Novedades de la semana
             Text("Novedades de la semana", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
@@ -184,7 +180,17 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
 
             Spacer(Modifier.height(24.dp))
 
-            Text("Categorías", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            // 🍴 Categorías
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Categorías", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                TextButton(onClick = { navController.navigate("categorias") }) {
+                    Text("Ver todas")
+                }
+            }
             Spacer(Modifier.height(8.dp))
 
             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
