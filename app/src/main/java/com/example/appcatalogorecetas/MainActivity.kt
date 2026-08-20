@@ -35,6 +35,7 @@ import com.example.appcatalogorecetas.ui.RecetaViewModel
 import com.example.appcatalogorecetas.ui.theme.AppCatalogoRecetasTheme
 import com.example.appcatalogorecetas.ui.PantallaBusqueda
 import com.example.appcatalogorecetas.ui.PantallaCategorias
+import com.example.appcatalogorecetas.ui.PantallaPerfil
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,6 +80,9 @@ fun RecetarioApp() {
                 }
                 composable("categorias") {
                     PantallaCategorias(navController = navController, viewModel = recetaViewModel)
+                }
+                composable("perfil") {
+                    PantallaPerfil(navController = navController, viewModel = recetaViewModel)
                 }
 
                 composable("detalles/{id}") { backStackEntry ->
