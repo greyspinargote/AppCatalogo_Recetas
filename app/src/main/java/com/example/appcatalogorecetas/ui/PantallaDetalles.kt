@@ -6,6 +6,8 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -55,7 +57,6 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
         cargando = false
     }
 
-    // Lanza la cámara. Si sale bien, guarda la foto junto a la receta como favorita.
     val lanzadorCamara = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { exito ->
@@ -68,7 +69,6 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
         }
     }
 
-    // Pide el permiso de cámara en tiempo de ejecución
     val lanzadorPermiso = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -103,7 +103,11 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
             Text("No se pudo cargar la receta.")
         }
     } else {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
 
             Box(
                 modifier = Modifier
@@ -134,7 +138,7 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .offset(y = (-32).dp)
             ) {
@@ -175,7 +179,6 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // SECCIÓN: MI VERSIÓN (CÁMARA)
                 Text(text = "Mi versión", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -222,8 +225,6 @@ fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, r
     }
 }
 
-// Crea un archivo vacío en el almacenamiento de la app y devuelve una Uri segura
-// (a través de FileProvider) para que la cámara pueda guardar la foto ahí.
 private fun crearUriParaFoto(context: android.content.Context): Uri {
     val carpeta = context.getExternalFilesDir("Pictures")
     if (carpeta != null && !carpeta.exists()) carpeta.mkdirs()

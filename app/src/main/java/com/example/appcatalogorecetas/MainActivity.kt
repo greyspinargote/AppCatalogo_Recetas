@@ -27,7 +27,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.appcatalogorecetas.data.local.PreferenciasDataStore
 import com.example.appcatalogorecetas.ui.PantallaAjustes
-import com.example.appcatalogorecetas.ui.PantallaCatalogo
 import com.example.appcatalogorecetas.ui.PantallaDetalles
 import com.example.appcatalogorecetas.ui.PantallaFavoritos
 import com.example.appcatalogorecetas.ui.PantallaInicio
