@@ -37,6 +37,9 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun PantallaDetalles(navController: NavController, viewModel: RecetaViewModel, recetaId: String) {

@@ -35,7 +35,12 @@ import com.example.appcatalogorecetas.ui.theme.AppCatalogoRecetasTheme
 import com.example.appcatalogorecetas.ui.PantallaBusqueda
 import com.example.appcatalogorecetas.ui.PantallaCategorias
 import com.example.appcatalogorecetas.ui.PantallaPerfil
-
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.painterResource
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,13 +119,15 @@ fun PantallaBienvenida(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "AppCatalogoRecetas",
-            style = MaterialTheme.typography.headlineMedium
+        Image(
+            painter = painterResource(id = R.drawable.ilustracion_chef),
+            contentDescription = "Ilustración de una chef cocinando",
+            modifier = Modifier.size(220.dp)
         )
 
         Text(
-            text = "Descubre, cocina y guarda tus recetas favoritas.",
+            text = "Descubre, cocina y guarda " +
+                    "tus recetas favoritas.",
             modifier = Modifier.padding(
                 top = 16.dp,
                 bottom = 24.dp

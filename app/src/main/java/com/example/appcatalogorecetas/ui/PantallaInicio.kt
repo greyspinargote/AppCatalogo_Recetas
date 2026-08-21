@@ -36,9 +36,7 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
     val scope = rememberCoroutineScope()
 
     val recetasApi by viewModel.recetasApi.collectAsState()
-    val novedad = recetasApi.firstOrNull()
 
-    // Estado de la ubicación: null = todavía no se activó
     var textoUbicacion by remember { mutableStateOf<String?>(null) }
     var ubicacionNoDisponible by remember { mutableStateOf(false) }
     var cargandoUbicacion by remember { mutableStateOf(false) }
@@ -72,7 +70,6 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
         }
     }
 
-    // Pide el permiso de ubicación en tiempo de ejecución (mismo patrón que la cámara en Detalles)
     val lanzadorPermisoUbicacion = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -105,7 +102,6 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
         ) {
             Spacer(Modifier.height(16.dp))
 
-            // 👋 Saludo
             Text(
                 text = "¡Hola! 👋",
                 style = MaterialTheme.typography.headlineSmall,
@@ -114,7 +110,6 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
 
             Spacer(Modifier.height(16.dp))
 
-            // 📍 Ubicación / GPS
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp)
@@ -152,26 +147,32 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
             Text("Novedades de la semana", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
-            if (novedad != null) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp)),
-                    onClick = { navController.navigate("detalles/${novedad.id}") }
-                ) {
-                    Column {
-                        AsyncImage(
-                            model = novedad.imagenUrl,
-                            contentDescription = novedad.nombre,
+            if (recetasApi.isNotEmpty()) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(recetasApi.take(5)) { receta ->
+                        Card(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(160.dp)
-                        )
-                        Text(
-                            text = novedad.nombre,
-                            modifier = Modifier.padding(12.dp),
-                            fontWeight = FontWeight.SemiBold
-                        )
+                                .width(220.dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            onClick = { navController.navigate("detalles/${receta.id}") }
+                        ) {
+                            Column {
+                                AsyncImage(
+                                    model = receta.imagenUrl,
+                                    contentDescription = receta.nombre,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(140.dp),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                )
+                                Text(
+                                    text = receta.nombre,
+                                    modifier = Modifier.padding(12.dp),
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 2
+                                )
+                            }
+                        }
                     }
                 }
             } else {
@@ -212,6 +213,45 @@ fun PantallaInicio(navController: NavController, viewModel: RecetaViewModel) {
                         }
                     }
                 }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // ⭐ Recetas populares
+            Text("Recetas populares", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(8.dp))
+
+            if (recetasApi.isNotEmpty()) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(recetasApi.take(6)) { receta ->
+                        Card(
+                            modifier = Modifier
+                                .width(160.dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            onClick = { navController.navigate("detalles/${receta.id}") }
+                        ) {
+                            Column {
+                                AsyncImage(
+                                    model = receta.imagenUrl,
+                                    contentDescription = receta.nombre,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(100.dp),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                )
+                                Text(
+                                    text = receta.nombre,
+                                    modifier = Modifier.padding(8.dp),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 2
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                Text("Cargando recetas...", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Spacer(Modifier.height(16.dp))
